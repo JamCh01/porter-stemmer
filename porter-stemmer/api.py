@@ -1,7 +1,7 @@
 class Stemmer(object):
     def __init__(self):
         self.vowels = 'aeiou'
-        self.cvc_ignore='wxy'
+        self.cvc_ignore = 'wxy'
 
     def is_consonant(self, letter: str) -> bool:
         # 判断字母是否为辅音
@@ -32,7 +32,7 @@ class Stemmer(object):
             return True
         return False
 
-    def is_end_with_double_same_consonants(self, stem: str)-> bool:
+    def is_end_with_double_same_consonants(self, stem: str) -> bool:
         # *d 判断词干以两个相同辅音结尾
         if len(stem) < 2:
             return False
@@ -43,14 +43,14 @@ class Stemmer(object):
             return False
         return True
 
-    def vowel_in_word(self, stem: str)-> bool:
+    def vowel_in_word(self, stem: str) -> bool:
         # *v* 判断词干包含一个元音
         for letter in stem:
             if self.is_vowel(letter=letter):
                 return True
         return False
 
-    def get_form(self, word):
+    def get_form(self, word: str) -> str:
         # 根据word的元音和辅音组成返回VC序列
         form = str()
         for index in range(len(word)):
@@ -68,12 +68,12 @@ class Stemmer(object):
                     form += 'V'
         return form
 
-    def get_m_count(self, word):
+    def get_m_count(self, word: str) -> int:
         # 获得单词中VC出现的次数
         return self.get_form(word=word).count('VC')
 
-    def cvc(self, word):
-        # *o  - 词干以cvc的形式结束, 但是第二个c（辅音）不是 W, X 或者Y
+    def cvc(self, word: str) -> bool:
+        # *o  - 判断词干是否以以cvc的形式结束, 但是第二个C（辅音）不是 W, X 或者Y
         if len(word) < 3:
             return False
         if self.consonant_in_word_by_index(word=word, index=-1) and \
