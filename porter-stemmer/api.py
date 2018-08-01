@@ -83,3 +83,14 @@ class Stemmer(object):
                 return True
             return False
         return False
+
+    def replace(self, origin: str, rem: str, rep: str, m=None) -> str:
+        # 将输入的origin单词后缀替换
+        if m is None:
+            return origin[:origin.rfind(rem)]+rep
+        else:
+            base = origin[:origin.rfind(rem)]
+            if self.get_m_count(word=base) > m:
+                return base+rep
+            else:
+                return origin
