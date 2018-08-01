@@ -1,6 +1,7 @@
 class Stemmer(object):
     def __init__(self):
         self.vowels = 'aeiou'
+        self.cvc_ignore='wxy'
 
     def is_consonant(self, letter: str) -> bool:
         # 判断字母是否为辅音
@@ -75,11 +76,10 @@ class Stemmer(object):
         # *o  - 词干以cvc的形式结束, 但是第二个c（辅音）不是 W, X 或者Y
         if len(word) < 3:
             return False
-        ignore = 'wxy'
         if self.consonant_in_word_by_index(word=word, index=-1) and \
                 self.vowel_in_word_by_index(word=word, index=-2) and \
                 self.consonant_in_word_by_index(word, index=-3):
-            if word[-1] not in ignore:
+            if word[-1] not in self.cvc_ignore:
                 return True
             return False
         return False
