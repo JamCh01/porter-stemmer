@@ -1,3 +1,6 @@
+from static import static
+
+
 class Stemmer(object):
     def __init__(self):
         self.vowels = 'aeiou'
@@ -17,7 +20,7 @@ class Stemmer(object):
         # 判断单词第index位是否为辅音
         letter = word[index]
         if self.is_consonant(letter=letter):
-            if letter == 'y' and self.is_consonant(word[index-1]):
+            if letter == 'y' and self.is_consonant(word[index - 1]):
                 return False
             return True
         return False
@@ -38,8 +41,8 @@ class Stemmer(object):
             return False
         if stem[-1] != stem[-2]:
             return False
-        if not (self.consonant_in_word_by_index(word=stem, index=-1) and
-                self.consonant_in_word_by_index(word=stem, index=-2)):
+        if not (self.consonant_in_word_by_index(word=stem, index=-1)
+                and self.consonant_in_word_by_index(word=stem, index=-2)):
             return False
         return True
 
@@ -87,10 +90,88 @@ class Stemmer(object):
     def replace(self, origin: str, rem: str, rep: str, m=None) -> str:
         # 将输入的origin单词后缀替换
         if m is None:
-            return origin[:origin.rfind(rem)]+rep
+            return origin[:origin.rfind(rem)] + rep
         else:
             base = origin[:origin.rfind(rem)]
             if self.get_m_count(word=base) > m:
-                return base+rep
+                return base + rep
             else:
                 return origin
+
+    def stem(self, word: str) -> str:
+        if word.endswith('sses'):
+            word = self.replace(origin=word, rem='sess', rep='ss')
+        elif word.endswith('ies'):
+            word = self.replace(origin=word, rem='ies', rep='i')
+        elif word.endswith('ss'):
+            word = self.replace(origin=word, rem='ss', rep='ss')
+        elif word.endswith('s'):
+            word = self.replace(origin=word, rem='s', rep='')
+
+        flag = False
+        if word.endswith('eed'):
+            base = word[:word.rfind('edd')]
+            if self.get_m_count(word=base):
+                word = base + 'ee'
+        elif word.endswith('ed'):
+            base = word[:word.rfind('ed')]
+            if self.vowel_in_word(stem=base):
+                word = base
+                flag = True
+        elif word.endswith('ing'):
+            base = word[:word.refind('ing')]
+            if self.vowel_in_word(stem=word):
+                word = base
+                flag = True
+
+        if flag:
+            if word.endswith(
+                ('at', 'bl', 'iz')
+            ) or self.get_m_count(word=word) == 1 and self.cvc(word=word):
+                word += 'e'
+            elif self.is_end_with_double_same_consonants(
+                    stem=word) and not self.is_end_with(
+                        stem=word, letter='l') and not self.is_end_with(
+                            stem=word, letter='s') and not self.is_end_with(
+                                stem=word, letter='z'):
+                word = word[:-1]
+
+        if word.endswith('y'):
+            base = word[:word.rfind('y')]
+            if self.vowel_in_word(stem=base):
+                word = base + 'i'
+
+        for x, y in static.step_a.items():
+            if word.endswith(x):
+                word = self.replace(origin=word, rem=x, rep=y)
+
+        for x, y in static.step_b.items():
+            if word.endswith(x):
+                word = self.replace(origin=word, rem=x, rep=y)
+
+        for x, y in static.step_c.items():
+            if word.endswith(x):
+                word = self.replace(origin=word, rem=x, rep=y, m=1)
+
+        if word.endswith('ion'):
+            base = word[:word.rfind('ion')]
+            if self.get_m_count(word=base) > 1 and (
+                    self.is_end_with(stem=base, letter='s')
+                    or self.is_end_with(stem=base, letter='t')):
+                word = base
+            else:
+                word = self.replace(origin=word, rem='', rep='', m=1)
+
+        if word.endswith('e'):
+            base = word[:-1]
+            m_count = self.get_m_count(word=base)
+            if m_count > 1 or (m_count == 1 and not self.cvc(word=base)):
+                word = base
+
+        if self.get_m_count(
+                word=word) > 1 and self.is_end_with_double_same_consonants(
+                    stem=word) and self.is_end_with(
+                        stem=word, letter='l'):
+            word = word[:-1]
+        return word
+        
