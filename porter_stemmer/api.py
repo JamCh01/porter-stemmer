@@ -1,4 +1,4 @@
-from static import static
+from .static import static
 
 
 class Stemmer(object):
